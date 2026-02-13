@@ -22,32 +22,42 @@ mcp = FastMCP("Error Fixer MCP Server 🔧")
 def get_jenkins_logs(
         build_number: str,
         job_name: str,
+        build_logs: str,
 ) -> dict:
-    """Récupère les logs d'un build Jenkins échoué.
+    """Récupère les logs d'un build Jenkins échoué (MODE SIMULATION).
 
     Args:
         build_number: Numéro du build Jenkins échoué (ex: "42").
         job_name: Nom du job Jenkins (ex: "springboot-user-service").
+        build_logs: Logs complets du build Jenkins fournis par l'utilisateur.
 
     Returns:
         Un dictionnaire contenant les lignes d'erreur du build ou un message d'erreur.
     """
     logger.info(f"--- 🛠️ Tool: get_jenkins_logs | job={job_name} | build={build_number} ---")
 
-    jenkins_url   = os.getenv("JENKINS_URL")
-    jenkins_user  = os.getenv("JENKINS_USER")
-    jenkins_token = os.getenv("JENKINS_TOKEN")
+    # ═══════════════════════════════════════════════════════════
+    # MODE SIMULATION : Les logs sont fournis directement par l'utilisateur
+    # ═══════════════════════════════════════════════════════════
+
+    # jenkins_url   = os.getenv("JENKINS_URL")
+    # jenkins_user  = os.getenv("JENKINS_USER")
+    # jenkins_token = os.getenv("JENKINS_TOKEN")
+
+    # try:
+    #     url = f"{jenkins_url}/job/{job_name}/{build_number}/consoleText"
+    #
+    #     response = httpx.get(
+    #         url,
+    #         auth=(jenkins_user, jenkins_token),
+    #     )
+    #     response.raise_for_status()
+    #
+    #     logs = response.text
 
     try:
-        url = f"{jenkins_url}/job/{job_name}/{build_number}/consoleText"
-
-        response = httpx.get(
-            url,
-            auth=(jenkins_user, jenkins_token),
-        )
-        response.raise_for_status()
-
-        logs = response.text
+        # Utiliser les logs fournis directement
+        logs = build_logs
 
         # Filtrer uniquement les lignes d'erreur pertinentes
         error_lines = [
@@ -62,11 +72,12 @@ def get_jenkins_logs(
             "job_name"    : job_name,
             "build_number": build_number,
             "error_lines" : error_lines,
+            "full_logs"   : logs,
             "status"      : "retrieved"
         }
 
-    except httpx.HTTPError as e:
-        return {"error": f"Impossible de récupérer les logs Jenkins : {e}"}
+    except Exception as e:
+        return {"error": f"Impossible de traiter les logs Jenkins : {e}"}
 
 
 # ─────────────────────────────────────────
@@ -80,9 +91,10 @@ def get_diff_push(
         repo_owner: str,
         repo_name : str,
         commit_sha: str,
+        commit_info: dict,
         chunk_index: int = 0,  # Index du chunk demandé (0 = premier)
 ) -> dict:
-    """Récupère les lignes modifiées d'un commit, divisées en chunks.
+    """Récupère les lignes modifiées d'un commit, divisées en chunks (MODE SIMULATION).
 
     Si le diff est trop grand, il sera divisé en plusieurs chunks.
     Appelez avec chunk_index=0, puis chunk_index=1, etc. jusqu'à is_last=True.
@@ -91,6 +103,7 @@ def get_diff_push(
         repo_owner: Propriétaire du dépôt GitHub.
         repo_name : Nom du dépôt GitHub.
         commit_sha: Hash du commit.
+        commit_info: Informations du commit (sha, author, date, message, java_files) fournies par l'utilisateur.
         chunk_index: Index du chunk à récupérer (défaut: 0).
 
     Returns:
@@ -98,18 +111,46 @@ def get_diff_push(
     """
     logger.info(f"--- 🛠️ Tool: get_diff_push | {repo_owner}/{repo_name}@{commit_sha[:7]} | chunk={chunk_index} ---")
 
-    try:
-        url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/commits/{commit_sha}"
-        response = httpx.get(url, headers={"Accept": "application/vnd.github.v3+json"})
-        response.raise_for_status()
-        data = response.json()
+    # ═══════════════════════════════════════════════════════════
+    # MODE SIMULATION : Les informations du commit sont fournies directement par l'utilisateur
+    # ═══════════════════════════════════════════════════════════
 
-        # Construire le diff complet (lignes +/- uniquement)
+    # try:
+    #     url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/commits/{commit_sha}"
+    #     response = httpx.get(url, headers={"Accept": "application/vnd.github.v3+json"})
+    #     response.raise_for_status()
+    #     data = response.json()
+    #
+    #     # Construire le diff complet (lignes +/- uniquement)
+    #     all_lines = []
+    #     for f in data.get("files", []):
+    #         patch = f.get("patch", "")
+    #         if patch:
+    #             filename = f["filename"].split('/')[-1]
+    #             lines = [
+    #                 line for line in patch.split('\n')
+    #                 if (line.startswith('+') or line.startswith('-'))
+    #                    and not line.startswith('+++')
+    #                    and not line.startswith('---')
+    #             ]
+    #             if lines:
+    #                 all_lines.append(f"[{filename}]")
+    #                 all_lines.extend(lines[:15])  # Max 15 lignes par fichier
+
+    try:
+        # Construire le diff complet à partir des données fournies
         all_lines = []
-        for f in data.get("files", []):
+        all_lines.append(f"Commit: {commit_info.get('sha', commit_sha)}")
+        all_lines.append(f"Author: {commit_info.get('author', 'unknown')}")
+        all_lines.append(f"Date: {commit_info.get('date', 'unknown')}")
+        all_lines.append(f"Message: {commit_info.get('message', 'unknown')}")
+        all_lines.append("")
+
+        for f in commit_info.get("java_files", []):
             patch = f.get("patch", "")
             if patch:
                 filename = f["filename"].split('/')[-1]
+                all_lines.append(f"[{filename}] ({f.get('status', 'unknown')})")
                 lines = [
                     line for line in patch.split('\n')
                     if (line.startswith('+') or line.startswith('-'))
@@ -117,8 +158,8 @@ def get_diff_push(
                        and not line.startswith('---')
                 ]
                 if lines:
-                    all_lines.append(f"[{filename}]")
                     all_lines.extend(lines[:15])  # Max 15 lignes par fichier
+                all_lines.append("")
 
         full_diff = '\n'.join(all_lines)
 
@@ -151,10 +192,11 @@ def get_diff_push(
             "chunk": chunk_index,
             "total": total_chunks,
             "is_last": chunk_index >= total_chunks - 1,
+            "commit_info": commit_info,
             "status": "retrieved"
         }
 
-    except httpx.HTTPError as e:
+    except Exception as e:
         return {"error": str(e)}
 
 
