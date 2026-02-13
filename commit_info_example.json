@@ -1,0 +1,13 @@
+{
+  "sha": "a7f3d91",
+  "author": "safwen707",
+  "date": "2025-02-13T15:30:45Z",
+  "message": "Add user CRUD methods",
+  "java_files": [
+    {
+      "filename": "src/main/java/com/example/userservice/service/UserService.java",
+      "status": "modified",
+      "patch": "@@ -1,6 +1,7 @@\n package com.example.userservice.service;\n \n import com.example.userservice.model.User;\n import com.example.userservice.repository.UserRepository;\n+import org.springframework.beans.factory.annotation.Autowired;\n import org.springframework.stereotype.Service;\n import org.springframework.transaction.annotation.Transactional;\n \n@@ -24,4 +25,28 @@ public class UserService {\n .orElseThrow(() -> new EntityNotFoundException(\"User not found with email: \" + email));\n }\n+\n+ @Transactional\n+ public User createUser(String name, String email) {\n+ User user = new User();\n+ user.setName(name);\n+ user.setEmail(email);\n+ User existingUser = userRepository.getUserById(1L);\n+ return userRepository.save(user);\n+ }\n+\n+ @Transactional\n+ public User updateUser(Long userId, String newEmail) {\n+ User user = userRepository.findById(userId);\n+ user.setEmail(newEmail);\n+ return userRepository.save(user);\n+ }\n+\n+ public void deleteUser(Long userId) {\n+ userRepository.deleteById(userId);\n+ }\n }\n"
+    }
+  ]
+}

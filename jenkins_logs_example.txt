@@ -1,0 +1,76 @@
+Started by user safwen707
+Running as SYSTEM
+Building in workspace /var/jenkins_home/workspace/springboot-user-service
+The recommended git tool is: NONE
+using credential github-credentials
+Cloning the remote Git repository
+Cloning repository https://github.com/Safwen707/springboot-user-service.git
+git init /var/jenkins_home/workspace/springboot-user-service # timeout=10
+Fetching upstream changes from https://github.com/Safwen707/springboot-user-service.git
+git --version # timeout=10
+git --version # 'git version 2.39.2'
+using GIT_ASKPASS to set credentials GitHub Personal Access Token
+git fetch --tags --force --progress -- https://github.com/Safwen707/springboot-user-service.git +refs/heads/:refs/remotes/origin/ # timeout=10
+git config remote.origin.url https://github.com/Safwen707/springboot-user-service.git # timeout=10
+git config --add remote.origin.fetch +refs/heads/:refs/remotes/origin/ # timeout=10
+Avoid second fetch
+git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision a7f3d918c42e5b1f9a0d6e3c8f2b4a1d5e7c9f0b (refs/remotes/origin/main)
+git config core.sparsecheckout # timeout=10
+git checkout -f a7f3d918c42e5b1f9a0d6e3c8f2b4a1d5e7c9f0b # timeout=10
+Commit message: "Add user CRUD methods"
+git rev-list --no-walk b2c4f8a9e1d3c7b5f6a0e2d4c8b1a3f5e7c9d0b1 # timeout=10
+[springboot-user-service] $ /bin/sh -xe /tmp/jenkins7234567890123456789.sh
+echo 'Building Spring Boot User Service...'
+Building Spring Boot User Service...
+mvn clean package
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ----------------< com.example:springboot-user-service >-----------------
+[INFO] Building springboot-user-service 1.0.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- maven-clean-plugin:3.1.0:clean (default-clean) @ springboot-user-service ---
+[INFO] Deleting /var/jenkins_home/workspace/springboot-user-service/target
+[INFO]
+[INFO] --- maven-resources-plugin:3.2.0:resources (default-resources) @ springboot-user-service ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Using 'UTF-8' encoding to copy filtered properties files.
+[INFO] Copying 1 resource
+[INFO] Copying 0 resource
+[INFO]
+[INFO] --- maven-compiler-plugin:3.8.1:compile (default-compile) @ springboot-user-service ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 6 source files to /var/jenkins_home/workspace/springboot-user-service/target/classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR :
+[INFO] -------------------------------------------------------------
+[ERROR] /var/jenkins_home/workspace/springboot-user-service/src/main/java/com/example/userservice/service/UserService.java:[33,46] cannot find symbol
+symbol: method getUserById(java.lang.Long)
+location: interface com.example.userservice.repository.UserRepository
+[ERROR] /var/jenkins_home/workspace/springboot-user-service/src/main/java/com/example/userservice/service/UserService.java:[39,22] incompatible types: java.util.Optional<com.example.userservice.model.User> cannot be converted to com.example.userservice.model.User
+[INFO] 2 errors
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 14.567 s
+[INFO] Finished at: 2025-02-13T15:31:12Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.8.1:compile (default-compile) on project springboot-user-service: Compilation failure: Compilation failure:
+[ERROR] /var/jenkins_home/workspace/springboot-user-service/src/main/java/com/example/userservice/service/UserService.java:[33,46] cannot find symbol
+[ERROR] symbol: method getUserById(java.lang.Long)
+[ERROR] location: interface com.example.userservice.repository.UserRepository
+[ERROR]
+[ERROR] /var/jenkins_home/workspace/springboot-user-service/src/main/java/com/example/userservice/service/UserService.java:[39,22] incompatible types: java.util.Optional<com.example.userservice.model.User> cannot be converted to com.example.userservice.model.User
+[ERROR]
+[ERROR] -> [Help 1]
+[ERROR]
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR]
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+Build step 'Execute shell' marked build as failure
+Notifying upstream projects of job completion
+Finished: FAILURE

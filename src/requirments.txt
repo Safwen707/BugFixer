@@ -1,0 +1,12 @@
+# Google ADK + Gemini
+google-genai
+google-adk
+a2a
+
+# MCP
+fastmcp
+
+# Utilitaires
+python-dotenv
+httpx
+asyncio

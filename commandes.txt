@@ -1,0 +1,5 @@
+cd /home/safwen/BugFixer/src
+uv run mcp-server/server.py
+
+cd /home/safwen/BugFixer/src
+uv run mcp-server/tester_server.py
